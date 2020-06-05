@@ -46,19 +46,23 @@ g_index = input("Enter a Number: ")
 target_group=groups[int(g_index)]
 
 
+
 print('Fetching Members...')
 all_participants = []
 all_participants = client.get_participants(target_group, aggressive=True)
 
+print(type(all_participants)) # log type all_participants 
+
 print('Saving In file...')
 with open("members.csv","w",encoding='UTF-8') as f:
     writer = csv.writer(f,delimiter=",",lineterminator="\n")
-    writer.writerow(['username','user id', 'access hash','name','group', 'group id'])
+    writer.writerow(['username','user id', 'access hash','name','group', 'group id','status'])
     for user in all_participants:
-        if user.username:
+        if user.username: # UserStatusRecently() for active account filter
             username= user.username
         else:
-            username= ""
+            #username= ""
+            continue
         if user.first_name:
             first_name= user.first_name
         else:
@@ -68,6 +72,16 @@ with open("members.csv","w",encoding='UTF-8') as f:
         else:
             last_name= ""
         name= (first_name + ' ' + last_name).strip()
-        writer.writerow([username,user.id,user.access_hash,name,target_group.title, target_group.id])      
-print('Members scraped successfully.')
 
+        t=user.stringify()
+        
+        from telethon import types
+        import time
+        if isinstance(user.status, types.UserStatusOffline):
+            print((user.status.was_online))
+            
+     
+        
+            writer.writerow([username,user.id,user.access_hash,name,target_group.title, target_group.id, \
+                             1 if time.time()-(user.status.was_online).timestamp() <=3600 else 0])      
+print('Members scraped successfully.')
