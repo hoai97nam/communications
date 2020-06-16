@@ -27,7 +27,7 @@ with open(input_file, encoding='UTF-8') as f:
         user = {}
         user['username'] = row[0]
         user['id'] = int(row[1])
-        user['access_hash'] = int(row[2])
+        user['access_hash'] = int(float(row[2])) # changing something in data type
         user['name'] = row[3]
         users.append(user)
 
@@ -64,10 +64,11 @@ target_group=groups[int(g_index)]
 target_group_entity = InputPeerChannel(target_group.id,target_group.access_hash)
 
 mode = int(input("Enter 1 to add by username or 2 to add by ID: "))
-
+i = 1 #testing numbering
 for user in users:
+    
     try:
-        print ("Adding {}".format(user['id']))
+        print ("{}. Adding {}".format(i, user['id'])) # this location "i"
         if mode == 1:
             if user['username'] == "":
                 continue
@@ -78,7 +79,8 @@ for user in users:
             sys.exit("Invalid Mode Selected. Please Try Again.")
         client(InviteToChannelRequest(target_group_entity,[user_to_add]))
         print("Waiting 60 Seconds...")
-        time.sleep(60)
+        time.sleep(100) #sleep 900 instead 60
+        i = i + 1   # this location increases counting unit
     except PeerFloodError:
         print("Getting Flood Error from telegram. Script is stopping now. Please try again after some time.")
     except UserPrivacyRestrictedError:
